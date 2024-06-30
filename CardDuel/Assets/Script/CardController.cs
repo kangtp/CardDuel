@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ButtonManager : MonoBehaviour
+public class CardController : MonoBehaviour
 {
     public List<string> cardList = new List<string>();
     public GameObject map;
+    
     public void ClickUpButton()
     {
         if (cardList.Count == 3)
@@ -55,9 +56,11 @@ public class ButtonManager : MonoBehaviour
 
     public void DoneButton()
     {
+        //Do not run if the card list is not full
+        if (cardList.Count != 3)
+            return;
+
         //카드 리스트 정보 보내기
-        //GameObject.Find("Map").SetActive(true);
-        //map.SetActive(true);
         FindObjectOfType<CardOpen>().GetPlayerCardList(cardList);
         GameObject.Find("CardSelectUI").SetActive(false);
     }

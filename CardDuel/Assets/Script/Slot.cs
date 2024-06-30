@@ -8,19 +8,14 @@ public class Slot : MonoBehaviour
 {
     public Sprite[] sprites;
     public Image[] images;
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
 
     // Update is called once per frame
     void Update()
     {
-        if(FindObjectOfType<ButtonManager>().cardList.Count != 0)
+        if(FindObjectOfType<CardController>().cardList.Count != 0)
         {
             int i = 0;
-            foreach (string card in FindObjectOfType<ButtonManager>().cardList)
+            foreach (string card in FindObjectOfType<CardController>().cardList)
             {
                 
                 if (card == "1")

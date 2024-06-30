@@ -7,27 +7,19 @@ public class Attack : MonoBehaviour
     public bool enemyHit = false;
     public bool playerHit = false;
     
-    void Start()
-    {
-        
-    }
-
-    
-    void Update()
-    {
-        
-    }
 
     public void HitCheck(string target)
     {
         if(target == "enemy" && enemyHit)
         {
             //enemy -1 heart
+            FindObjectOfType<Enemy>().GetDamage();
             Debug.Log("enemy -1");
         }
         else if(target == "player" && playerHit)
         {
             //player -1 heart
+            FindObjectOfType<Player>().GetDamage();
             Debug.Log("player -1");
         }
     }

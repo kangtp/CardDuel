@@ -8,42 +8,27 @@ public class CardOpen : MonoBehaviour
     public GameObject enemy;
     private int playerPosition = 5;
     private int enemyPosition = 8;
-    private float timer = 0.0f;
     List<string> playerCardList;
     List<string> enemyCardList;
     private int i = 0;
     private bool isOpening = false; //카드 오픈 여부
+    private bool endTurn = false;
     public GameObject cardSelectUI;
 
     private void Update()
     {
         if (isOpening)  //카드발동이 true이면
         {
-            timer += Time.deltaTime;
-            if (timer > 3f)
-            {
-                CardActivate(i);    //카드 발동 함수 실행
-                timer = 0;
-                i++;
-            }
-            //after activating 3 card, then stop.
-            if (i >= 3)
-            {
-                isOpening = false;
-                i = 0;
-                timer = 0;
-                
-                
-                Invoke("ChangeScene", 3f);
-            }
+            StartCoroutine(CardActivate());    //코루틴을 시작하여 카드 발동 함수 실행
+            isOpening = false;
         }
     }
 
     void ChangeScene()
     {
         cardSelectUI.SetActive(true);
-        //FindObjectOfType<EnemyCardList>().EnemyCardSelect();
-        //playerCardList.Clear();
+        FindObjectOfType<EnemyCardList>().EnemyCardSelect();
+        FindObjectOfType<CardController>().ClearButton();
     }
 
     //get player card list
@@ -64,57 +49,15 @@ public class CardOpen : MonoBehaviour
     }
 
     //card open function
-    void CardActivate(int i)
+    IEnumerator CardActivate()
     {
-        StartCoroutine(PlayerTurn1(i));
-    }
-
-    void PlayerTurn()
-    {
-        if (playerCardList[i] == "up")
+        for (int i = 0; i < 3; i++)
         {
-            MoveUp(player);
+            endTurn = false;
+            StartCoroutine(PlayerTurn(i));
+            yield return new WaitUntil(() => endTurn);  //endTurn이 true가 될 때까지 대기
         }
-        else if (playerCardList[i] == "down")
-        {
-            MoveDown(player);
-        }
-        else if (playerCardList[i] == "left")
-        {
-            MoveLeft(player);
-        }
-        else if (playerCardList[i] == "right")
-        {
-            MoveRight(player);
-        }
-        else
-        {
-            Attack("enemy", playerCardList[i]);
-        }
-    }
-
-    void EnemyTurn()
-    {
-        if (enemyCardList[i] == "up")
-        {
-            MoveUp(enemy);
-        }
-        else if (enemyCardList[i] == "down")
-        {
-            MoveDown(enemy);
-        }
-        else if (enemyCardList[i] == "left")
-        {
-            MoveLeft(enemy);
-        }
-        else if (enemyCardList[i] == "right")
-        {
-            MoveRight(enemy);
-        }
-        else
-        {
-            Attack("player", enemyCardList[i]);
-        }
+        Invoke("ChangeScene", 3f);
     }
 
     void MoveUp(GameObject target)
@@ -223,11 +166,11 @@ public class CardOpen : MonoBehaviour
 
     void Attack(string target, string num)
     {
-        GameObject.Find("Block" + num).GetComponent<Attack>().HitCheck(target);
         Debug.Log("Attack " + num);
+        GameObject.Find("Block" + num).GetComponent<Attack>().HitCheck(target);
     }
 
-    IEnumerator PlayerTurn1(int i)
+    IEnumerator PlayerTurn(int i)
     {
         yield return new WaitForSeconds(6f);
 
@@ -252,10 +195,10 @@ public class CardOpen : MonoBehaviour
             Attack("enemy", playerCardList[i]);
         }
 
-        StartCoroutine(EnemyTurn1(i));
+        StartCoroutine(EnemyTurn(i));
     }
 
-    IEnumerator EnemyTurn1(int i)
+    IEnumerator EnemyTurn(int i)
     {
         yield return new WaitForSeconds(3f);
 
@@ -279,6 +222,8 @@ public class CardOpen : MonoBehaviour
         {
             Attack("player", enemyCardList[i]);
         }
+        endTurn = true;
+
     }
     
 }

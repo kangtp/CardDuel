@@ -12,18 +12,13 @@ public class EnemyCardList : MonoBehaviour
         EnemyCardSelect();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public void EnemyCardSelect()
     {
         enemyCardList.Clear();
         for(int i = 0; i < 3; i++)
         {
-            int index = Random.Range(0, 4);
+            int index = Random.Range(0, 16);
             enemyCardList.Add(cards[index]);
         }
         FindObjectOfType<CardOpen>().GetEnemyCardList(enemyCardList);
