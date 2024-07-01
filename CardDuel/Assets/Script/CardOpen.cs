@@ -6,14 +6,20 @@ public class CardOpen : MonoBehaviour
 {
     public GameObject player;
     public GameObject enemy;
-    private int playerPosition = 5;
-    private int enemyPosition = 8;
+    public GameObject cardSelectUI;
+
     List<string> playerCardList;
     List<string> enemyCardList;
-    private int i = 0;
+
+    private int playerPosition = 5;
+    private int enemyPosition = 8;
+    
     private bool isOpening = false; //카드 오픈 여부
     private bool endTurn = false;
-    public GameObject cardSelectUI;
+
+    public Vector3 originScale;
+    public Vector3 maxScale = new Vector3(8, 8, 8);
+    public float scaleSpeed = 0.2f; // 크기 조정 속도
 
     private void Update()
     {
@@ -57,12 +63,21 @@ public class CardOpen : MonoBehaviour
             StartCoroutine(PlayerTurn(i));
             yield return new WaitUntil(() => endTurn);  //endTurn이 true가 될 때까지 대기
         }
-        Invoke("ChangeScene", 3f);
+
+        yield return new WaitForSeconds(2f);
+        //카드 다시 덮어놓기
+        for (int j = 0; j < 3; j++)
+        {
+            GameObject.Find("PlayerCover").transform.GetChild(j).gameObject.SetActive(true);
+            GameObject.Find("EnemyCover").transform.GetChild(j).gameObject.SetActive(true);
+        }
+        Invoke("ChangeScene", 1f);
     }
 
     void MoveUp(GameObject target)
     {
-        if(target == player)
+        AudioManager.instance.PlaySFX("Move");
+        if (target == player)
         {
             if (playerPosition - 4 <= 0)
             {
@@ -88,7 +103,8 @@ public class CardOpen : MonoBehaviour
 
     void MoveDown(GameObject target)
     {
-        if(target == player)
+        AudioManager.instance.PlaySFX("Move");
+        if (target == player)
         {
             if (playerPosition + 4 >= 13)
             {
@@ -114,7 +130,8 @@ public class CardOpen : MonoBehaviour
 
     void MoveLeft(GameObject target)
     {
-        if(target == player)
+        AudioManager.instance.PlaySFX("Move");
+        if (target == player)
         {
             if (playerPosition % 4 == 1)
             {
@@ -140,7 +157,8 @@ public class CardOpen : MonoBehaviour
 
     void MoveRight(GameObject target)
     {
-        if(target == player) 
+        AudioManager.instance.PlaySFX("Move");
+        if (target == player) 
         {
             if (playerPosition % 4 == 0)
             {
@@ -167,12 +185,20 @@ public class CardOpen : MonoBehaviour
     void Attack(string target, string num)
     {
         Debug.Log("Attack " + num);
-        GameObject.Find("Block" + num).GetComponent<Attack>().HitCheck(target);
+        GameObject.Find("Block" + num).GetComponent<AttackManager>().HitCheck(target);
     }
 
     IEnumerator PlayerTurn(int i)
     {
-        yield return new WaitForSeconds(6f);
+        //카드 공개
+        yield return new WaitForSeconds(2f);
+        AudioManager.instance.PlaySFX("CardOpen");
+        GameObject.Find("PlayerCover").transform.GetChild(i).gameObject.SetActive(false);
+        StartCoroutine(CardOpenEffect("player",i));
+
+
+        //동작 실행
+        yield return new WaitForSeconds(1.5f);
 
         if (playerCardList[i] == "up")
         {
@@ -193,6 +219,7 @@ public class CardOpen : MonoBehaviour
         else
         {
             Attack("enemy", playerCardList[i]);
+            yield return new WaitForSeconds(1.5f);
         }
 
         StartCoroutine(EnemyTurn(i));
@@ -200,7 +227,14 @@ public class CardOpen : MonoBehaviour
 
     IEnumerator EnemyTurn(int i)
     {
-        yield return new WaitForSeconds(3f);
+        //카드 공개
+        yield return new WaitForSeconds(2f);
+        AudioManager.instance.PlaySFX("CardOpen");
+        GameObject.Find("EnemyCover").transform.GetChild(i).gameObject.SetActive(false);
+        StartCoroutine(CardOpenEffect("enemy",i));
+
+        //동작 실행
+        yield return new WaitForSeconds(1.5f);
 
         if (enemyCardList[i] == "up")
         {
@@ -221,9 +255,42 @@ public class CardOpen : MonoBehaviour
         else
         {
             Attack("player", enemyCardList[i]);
+            yield return new WaitForSeconds(1.5f);
         }
+
         endTurn = true;
 
+    }
+
+    IEnumerator CardOpenEffect(string player, int i)
+    {
+        GameObject target = null;
+
+        if(player == "player")
+            target = GameObject.Find("PlayerDeck").transform.GetChild(i).gameObject;
+        else if(player == "enemy")
+            target = GameObject.Find("EnemyDeck").transform.GetChild(i).gameObject;
+
+        originScale = target.transform.localScale;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < scaleSpeed)
+        {
+            // 선형 보간을 사용하여 크기를 조정
+            target.transform.localScale = Vector3.Lerp(originScale, maxScale, elapsedTime / scaleSpeed);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        elapsedTime = 0f;
+
+        while (elapsedTime < scaleSpeed)
+        {
+            // 선형 보간을 사용하여 크기를 조정
+            target.transform.localScale = Vector3.Lerp(maxScale, originScale, elapsedTime / scaleSpeed);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
     }
     
 }

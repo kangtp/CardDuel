@@ -21,6 +21,7 @@ public class Enemy : MonoBehaviour
         if(health <= 0)
         {
             Debug.Log("Game Over: Player win");
+            FindObjectOfType<GameManager>().GameOverWin();
         }
     }
 }

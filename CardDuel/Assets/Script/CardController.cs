@@ -8,8 +8,14 @@ public class CardController : MonoBehaviour
     public List<string> cardList = new List<string>();
     public GameObject map;
     
+    public List<string> getCardList()
+    {
+        return cardList;
+    }
+
     public void ClickUpButton()
     {
+        AudioManager.instance.PlaySFX("cardSelect");
         if (cardList.Count == 3)
             return;
 
@@ -18,6 +24,7 @@ public class CardController : MonoBehaviour
 
     public void ClickDownButton()
     {
+        AudioManager.instance.PlaySFX("cardSelect");
         if (cardList.Count == 3)
             return;
 
@@ -26,6 +33,7 @@ public class CardController : MonoBehaviour
 
     public void ClickLeftButton()
     {
+        AudioManager.instance.PlaySFX("cardSelect");
         if (cardList.Count == 3)
             return;
 
@@ -35,6 +43,7 @@ public class CardController : MonoBehaviour
 
     public void ClickRightButton()
     {
+        AudioManager.instance.PlaySFX("cardSelect");
         if (cardList.Count == 3)
             return;
 
@@ -43,6 +52,7 @@ public class CardController : MonoBehaviour
 
     public void ClickNumButton(string num)
     {
+        AudioManager.instance.PlaySFX("cardSelect");
         if (cardList.Count == 3)
             return;
 
@@ -51,6 +61,7 @@ public class CardController : MonoBehaviour
 
     public void ClearButton()
     {
+        AudioManager.instance.PlaySFX("cardClear");
         cardList.Clear();
     }
 
@@ -58,10 +69,14 @@ public class CardController : MonoBehaviour
     {
         //Do not run if the card list is not full
         if (cardList.Count != 3)
+        {
+            AudioManager.instance.PlaySFX("DoneFail");
             return;
-
+        }
         //카드 리스트 정보 보내기
+        AudioManager.instance.PlaySFX("cardDone");
         FindObjectOfType<CardOpen>().GetPlayerCardList(cardList);
+        GameObject.Find("PlayerDeck").gameObject.GetComponent<Deck>().Setting();
         GameObject.Find("CardSelectUI").SetActive(false);
     }
 }

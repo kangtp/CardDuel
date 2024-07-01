@@ -12,6 +12,10 @@ public class EnemyCardList : MonoBehaviour
         EnemyCardSelect();
     }
 
+    public List<string> getCardList()
+    {
+        return enemyCardList;
+    }
 
     public void EnemyCardSelect()
     {
@@ -22,5 +26,6 @@ public class EnemyCardList : MonoBehaviour
             enemyCardList.Add(cards[index]);
         }
         FindObjectOfType<CardOpen>().GetEnemyCardList(enemyCardList);
+        GameObject.Find("EnemyDeck").gameObject.GetComponent<Deck>().Setting();
     }
 }
