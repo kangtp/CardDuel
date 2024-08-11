@@ -188,6 +188,11 @@ public class CardOpen : MonoBehaviour
         GameObject.Find("Block" + num).GetComponent<AttackManager>().HitCheck(target);
     }
 
+    public int GetPlayerPosition()
+    {
+        return playerPosition;
+    }
+
     IEnumerator PlayerTurn(int i)
     {
         //카드 공개
